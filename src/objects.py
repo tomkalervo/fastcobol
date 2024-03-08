@@ -31,3 +31,18 @@ class Condition:
                     # or List of operations to run on true
     conFalse = []   # List of operations to run on false
     
+class Program:
+    name = None
+    data = None
+    code = None
+    def __init__(self,name='unnamed') -> None:    
+        self.name = name 
+        self.data = []
+        self.code = []
+    def __str__(self) -> str:
+        return f"Program instance: <name={self.name}, lines of data={len(self.data)}, lines of code={len(self.code)}>"
+    
+class Comment:
+    text = None
+    def __init__(self,text: str) -> None:    
+        self.text = text 

@@ -2,15 +2,24 @@ import sys,os
 #import src
 #from objects import*
 
-def test_1():
+def test_2():
     from mapper import map_it 
+    return_code = None
+    return_msg = None
+    with open("test/examples/code1_fcob.txt","r") as file:
+        text = file.read()
+        return_code, return_msg = map_it(text)
+    if return_code:
+        print('End with success: ', return_msg)
+    else:
+        print('End with failure: ', return_msg)
+
+def test_1():
     from objects import Variable,Section,Condition,Operation 
     v1 = Variable(picType='X(03)',scope='local')
     print(v1)
     op1 = Operation(opType='MOVE',variables=['SPACE',v1])
-    print(op1)
-    map_it()
-    
+    print(op1) 
 
 def main() -> int:
     try:
@@ -19,7 +28,8 @@ def main() -> int:
     except ImportError:
         print("Failed to import 'example_module'")
     test_1()
-    return 0
+    test_2()
+    return 1
     
 if __name__ == '__main__':
     path = os.getcwd() + '/src'
