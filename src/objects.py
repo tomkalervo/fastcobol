@@ -2,10 +2,12 @@ class Variable:
     picType = None       
     name = None
     scope = None  
-    def __init__(self,picType='X',name='AA-NAME',scope='global') -> None:  
+    display = None
+    def __init__(self,picType='X',name='AA-NAME',scope='global',display=False) -> None:  
         self.picType = picType       
         self.name = name
         self.scope = scope     
+        self.display = display
     def __str__(self) -> str:
         return f"Variable instance: <{self.name} PIC {self.picType}> declared at a {self.scope} scope."
 
