@@ -49,45 +49,45 @@ def map_it(text: str) -> (int,str):
         bracket -= lines[line_i].count('}')
         line_i += 1
 
-    return_code,prog = parse_program(program=prog,lines_of_code=lines[prog_start:line_i-1])
+    return_code = parse_program(program=prog,
+                                lines_of_code=lines,
+                                current_line=prog_start,
+                                total_lines=line_i-1)
     
     print(f"Map it completed with return code={return_code}")
     if return_code == ERROR:
         return ERROR, 'er'
     print(prog)
-    for i,code in enumerate(prog.code):
+    for i,code in enumerate(prog.procedure):
         print(f"{i}:\t{code}")
         
     return OK, 'ok'
 
-def parse_program(program:Program,lines_of_code:list) -> Program:
-    return_code,code,data = parse_line([],[],lines_of_code,0,len(lines_of_code))
-    if return_code == OK:
-        program.code = code
-        program.data = data
-        return OK,program
-    else:
-        return ERROR,program
-
-# Recursive function
-def parse_line(code:list,data:list,lines_of_code:list,current_line:int,total_lines:int) -> (list,list):
+def parse_program(program:Program,
+                  lines_of_code:list,
+                  current_line:int,
+                  total_lines:int) -> int:
     # Basecase
     if current_line == total_lines:
-        return OK,code,data 
+        return OK
     
+    # Evaluate expression to prepare for builder
     expression = lines_of_code[current_line]
-    print(expression)
     return_code,e_type,value = evaluate_expression(expression)
-    print(f'{return_code},{e_type},{value}')
     if return_code == ERROR:
         ERROR,code,data
     
-    # TODO
-    # Handle return, library with function calls? v,f,uf
-    
+    # Parse expression and add to program
+    return_code = parse_expression(program,e_type,lines_of_code,current_line,total_lines)
+    if return_code == ERROR:
+        ERROR,code,data
+        
     current_line += 1
     # Recursive call
-    return parse_line(code,data,lines_of_code,current_line,total_lines) 
+    return parse_program(program=program,
+                         lines_of_code=lines_of_code,
+                         current_line=current_line,
+                         total_lines=total_lines) 
 
 def evaluate_expression(e):
     import re
@@ -105,3 +105,22 @@ def evaluate_expression(e):
         return OK,'uf',match.group()
 
     return ERROR,'Incorrent line',e
+
+def get_variable(program:Program,lines:list,i:int,lines_len:int) -> int:
+    print(f'get_variable, {lines[i]}')
+    return 1
+def get_function(program:Program,lines:list,i:int,lines_len:int) -> int:
+    print(f'get_function, {lines[i]}')
+    return 1
+def get_user_function(program:Program,lines:list,i:int,lines_len:int) -> int:
+    print(f'user_get_function, {lines[i]}')
+    return 1
+
+CODE_EXP = {
+    'v':get_variable,
+    'f':get_function,
+    'uf':get_user_function
+}
+
+def parse_expression(program:Program,e_type:str,lines:list,i:int,lines_len:int) -> int:
+    return CODE_EXP[e_type](program=program,lines=lines,i=i,lines_len=lines_len)
