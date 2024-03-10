@@ -16,7 +16,7 @@ def test_2():
 
 def test_1():
     from objects import Variable,Section,Condition,Operation 
-    v1 = Variable(picType='X(03)',scope='local')
+    v1 = Variable(ptype='int',scope='local')
     print(v1)
     op1 = Operation(opType='MOVE',variables=['SPACE',v1])
     print(op1) 
@@ -27,7 +27,9 @@ def main() -> int:
         print("Module 'example_module' imported successfully!")
     except ImportError:
         print("Failed to import 'example_module'")
+    print('='*20,'test1','='*20)
     test_1()
+    print('='*20,'test2','='*20)
     test_2()
     return 1
     

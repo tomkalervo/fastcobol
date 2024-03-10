@@ -3,15 +3,33 @@ MAIN_EXIT = 'GOBACK'
 WORKING_STORAGE_LEVELS = (1,5), 5
 
 class Variable:
+    types = {
+        'u_int':('9',12),
+        'int':('S9',12),
+        'string':('X',30)
+    }
     picType = None       
     name = None
     scope = None  
     display = None
-    def __init__(self,picType='X',name='AA-NAME',scope='global',display=False) -> None:  
-        self.picType = picType       
+    def parseType(self,ptype:str) -> int:
+        ptype_info = ptype.split('(')
+        if len(ptype_info) > 1:
+            p = ptype_info[0]
+            [size] = ptype_info[1].strip(')')
+            print(p,size)
+            if p in types and size.isNumeric():
+                self.picType = (p,int(size))
+        else:
+            if ptype in self.types:
+                self.picType = self.types[ptype]
+        
+    def __init__(self,ptype:str,name='AA-NAME',scope='global',display=False) -> None:  
+        self.parseType(ptype)
         self.name = name
         self.scope = scope     
         self.display = display
+        
     def __str__(self) -> str:
         return f"Variable instance: <{self.name} PIC {self.picType}> declared at a {self.scope} scope."
     
@@ -45,9 +63,9 @@ class Section:
 
     def __str__(self) -> str:
         return f"Section instance: <{self.name} "\
-                "with exit routine {self.exit_routine}, "\
-                "conditions={len(self.conditions)}, "\
-                "operations={len(self.operations)}>"
+               f"with exit routine {self.exit_routine}, "\
+               f"conditions={len(self.conditions)}, "\
+               f"operations={len(self.operations)}>"
     
     
 class Program:
@@ -64,8 +82,8 @@ class Program:
         
     def __str__(self) -> str:
         return f"Program instance: <name={self.name}, "\
-                "lines of data={len(self.data)}, "\
-                "elements in procedure={len(self.procedure)}>"
+               f"data items={len(self.data)}, "\
+               f"elements in procedure={len(self.procedure)}>"
                 
     def add_procedure(self,proc,variables:list) -> None:
         """_summary_
