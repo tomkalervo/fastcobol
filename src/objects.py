@@ -8,11 +8,7 @@ class Variable:
         'int':('S9',12),
         'string':('X',30)
     }
-    picType = None       
-    name = None
-    scope = None  
-    display = None
-    def parseType(self,ptype:str) -> int:
+    def parseType(self,ptype:str) -> None:
         ptype_info = ptype.split('(')
         if len(ptype_info) > 1:
             p = ptype_info[0]
@@ -29,9 +25,13 @@ class Variable:
         self.name = name
         self.scope = scope     
         self.display = display
+        self.picType_operations = set()
         
     def __str__(self) -> str:
         return f"Variable instance: <{self.name} PIC {self.picType}> declared at a {self.scope} scope."
+    
+    # def __add__(self,other:'Variable') -> None:
+    #     self.picType_operations.add(other.picType)
     
 class Operation:
     opType = None
@@ -49,35 +49,12 @@ class Condition:
     conTrue = []    # List of tuples (condition,list of operations)
                     # or List of operations to run on true
     conFalse = []   # List of operations to run on false
-    
-class Section:
-    name = None
-    exit_routine = None
-    conditions = []
-    operations = []
-    def __init__(self,name:str,variables=[],operations=[],exit_routine=Operation(opType='CONTINUE')) -> None:  
-        self.name = name       
-        self.variables = variables
-        self.operations = operations
-        self.exit_routine = exit_routine
-
-    def __str__(self) -> str:
-        return f"Section instance: <{self.name} "\
-               f"with exit routine {self.exit_routine}, "\
-               f"conditions={len(self.conditions)}, "\
-               f"operations={len(self.operations)}>"
-    
-    
+        
 class Program:
-    name = None
-    data = None
-    procedure = None
-    section = None
     def __init__(self,name='unnamed') -> None:    
         self.name = name 
         self.data = {}
-        main = Section(name='main',exit_routine=Operation(opType=MAIN_EXIT))
-        self.section = {'main':main}
+        self.section = {}
         self.procedure = []
         
     def __str__(self) -> str:
@@ -85,21 +62,10 @@ class Program:
                f"data items={len(self.data)}, "\
                f"elements in procedure={len(self.procedure)}>"
                 
-    def add_procedure(self,proc,variables:list) -> None:
-        """_summary_
-
-        Args:
-            proc (Operation, Comment): Procedure to add to the program
-            variables (list): list of variables used in the procedure
-        """
-        self.procedure.append(proc)
-        for v in variables:
-            if v.name in self.data:
-                self.data[v.name]['reference'].append(proc)
-            else:
-                self.data[v.name] = {'reference':[proc],'variable':v}
+    def add_operation(self,operation:Operation) -> None:
+        self.procedure.append(operation)
                 
-    def add_section(self,sec:Section,variables:list) -> int:
+    def add_section(self,sec,variables:list) -> int:
         """_summary_
 
         Args:
@@ -118,6 +84,19 @@ class Program:
             else:
                 self.data[v.name] = {'reference':[proc],'variable':v}
         return 1, "ok"
+    
+class Section(Program):
+    exit_routine = None
+    def __init__(self,name:str,exit_routine=Operation(opType='CONTINUE')) -> None:  
+        super().__init__(name)
+        self.exit_routine = exit_routine
+
+    def __str__(self) -> str:
+        return f"Section instance: <{self.name} "\
+               f"with exit routine {self.exit_routine}, "\
+               f"conditions={len(self.conditions)}, "\
+               f"operations={len(self.operations)}>"
+               
 class Comment:
     text = None
     def __init__(self,text: str) -> None:    

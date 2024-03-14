@@ -1,14 +1,15 @@
 from objects import *
-VARIABLES = [
+VARIABLE_DECLARE = [
     'u_int',
     'int',
     'string'
 ]
-FUNCTIONS = [
+FUNCTION_SYSTEM = [
     'print'
 ]
-USER_FUNCTION = r'\b[a-zA-Z0-9]+\s*\('
-USER_VARIABLE = r'\b[a-zA-Z0-9]+\s*\='
+FUNCTION_DECLARE = 'func'
+FUNCTION_CALL = r'\b[a-zA-Z0-9]+\s*\('
+VARIABLE_OPERATION = r'\b[a-zA-Z0-9]+\s*\='
 ERROR = 0
 OK = 1
 
@@ -74,15 +75,11 @@ def parse_program(program:Program,
     if current_line == total_lines:
         return OK
     
-    # Evaluate expression to prepare for builder
-    expression = lines_of_code[current_line]
-    return_code,e_type,value = evaluate_expression(expression)
-    if return_code == ERROR:
-        print(f'Error in evaluate_expression(): {e_type}. Expression value {value}')
-        return ERROR
-    
     # Parse expression and add to program
-    return_code = parse_expression(program,e_type,lines_of_code,current_line,total_lines)
+    return_code,current_line = parse_expression(program,
+                                                lines_of_code,
+                                                current_line,
+                                                total_lines)
     if return_code == ERROR:
         return ERROR
         
@@ -92,77 +89,173 @@ def parse_program(program:Program,
                          lines_of_code=lines_of_code,
                          current_line=current_line,
                          total_lines=total_lines) 
-# TODO:
-# Three types of expressions: Operation, Function or Condition.
-# Operation, in turn, can contain variable declaration.
-# How many lines do the operation include? ; ?
-# Function, in turn, can be defined by the user.
-# How many lines do the function include? (){} ?
-# Condition (if-else, evaluate-when): Future feature
-def evaluate_expression(e):
+
+def evaluate_expression(e:str) -> (int,str,str):
     import re
 
-    for v in VARIABLES:
+    for v in VARIABLE_DECLARE:
         if e.strip().startswith(v):
-            return OK,'v',v
+            return OK,'vd',v
     
-    match = re.match(USER_VARIABLE, e)
+    match = re.match(VARIABLE_OPERATION, e)
     if match:
-        return OK,'uv',match.group()
+        return OK,'vo',match.group()
     
-    for f in FUNCTIONS:
+    for f in FUNCTION_SYSTEM:
         if e.strip().startswith(f):
-            return OK,'f',f
+            return OK,'fs',f
         
-    match = re.match(USER_FUNCTION, e)
+    if e.strip().startswith(FUNCTION_DECLARE):
+        return OK,'fd',f
+    
+    match = re.match(FUNCTION_CALL, e)
     if match:
-        return OK,'uf',match.group()
+        return OK,'fc',match.group()
 
     return ERROR,'Incorrent line',e
 
-def parse_operation(process,expression:str) -> int:
-    
-    return OK
+def parse_VARIABLE_DECLARE(program:Program,
+                           expression:list,
+                           lines:list,
+                           i:int,
+                           lines_len:int) -> (int,int):
+    print(f'parse_VARIABLE_DECLARE, {lines[i]}')
+    if not expression:
+        return ERROR,i
+    else:
+        ptype = expression.pop()
+        
+    if not expression:
+        return ERROR,i
+    else:
+        name = expression[-1]
 
-def get_user_variable(program:Program,lines:list,i:int,lines_len:int) -> int:
-
-    return OK
-
-def get_variable(program:Program,lines:list,i:int,lines_len:int) -> int:
-    print(f'get_variable, {lines[i]}')
-    expression = lines[i].strip().split()
-    parts = len(expression)
-    if parts < 4:
-        return ERROR
-    if expression[2] != '=':
-        return ERROR
-    # variable declaration
-    ptype = expression[0]
-    name = expression[1]
     if name not in program.data:
         v = Variable(ptype=ptype,name=name)
         if v.picType == None:
-            return ERROR
+            return ERROR,i
         else:
             program.data[name] = v
         
-    # VARIABLES expression / instance
+    return parse_VARIABLE_OPERATION(program,expression,lines,i,lines_len)
+def parse_VARIABLE_OPERATION(program:Program,
+                           expression:list,
+                           lines:list,
+                           i:int,
+                           lines_len:int) -> (int,int):
+    print(f"parse_VARIABLE_OPERATION, {expression=}")
+    if not expression:
+        return ERROR,i
     
+    x = expression.pop()
+    if x not in program.data:
+        return ERROR,i
+    else:
+        x_var = program.data[x]
     
-    return OK
-def get_function(program:Program,lines:list,i:int,lines_len:int) -> int:
+    if not expression:
+        return ERROR,i
+    
+    op = expression.pop()
+    
+    if op == ';':
+        return OK,i
+    
+    if op != '=':
+        return ERROR,i
+    else:
+        operation = Operation(variables=[x],opType=op)
+    
+    if not expression:
+        return ERROR,i
+    
+    def is_type(s, type_conversion):
+        try:
+            type_conversion(s)
+            return True
+        except ValueError:
+            return False
+
+    while expression:
+        y = expression.pop()
+        print(f'{y=}')
+        if y == ';':
+            program.add_operation(operation)
+            return OK,i
+        if y[-1] == ';':
+            y = y[:-1]
+            expression.append(';')
+        y_picType = None
+        if y in program.data:
+            y_var = program.data[y]
+            y_picType = y_var.picType
+        elif is_type(y,int):
+            y_var = int(y)
+            if y_var < 0:
+                y_picType = ('int',len(y))
+            else:
+                y_picType = ('u_int',len(y))
+        elif is_type(y,float):
+            y_var = float(y)
+            if y_var < 0:
+                y_picType = ('float',len(y))
+            else:
+                y_picType = ('u_float',len(y))
+        elif y[0] == y[-1] and y[0] in ['"',"'"] and len(y > 2):
+            y_var = y[1:-1]
+            y_picType = ('string',len(y_var))         
+        #TODO elif an operation '+,-,*,/'
+        # Every second item must be an operation...
+        else:
+            return ERROR, i       
+        
+        x_var.picType_operations.add(y_picType)        
+        operation.variables.append(y_var)
+    
+    return ERROR,i
+
+def parse_FUNCTION_SYSTEM(program:Program,
+                           expression:list,
+                           lines:list,
+                           i:int,
+                           lines_len:int) -> (int,int):
+
+    return OK,i
+def parse_FUNCTION_DECLARE(program:Program,
+                           expression:list,
+                           lines:list,
+                           i:int,
+                           lines_len:int) -> (int,int):
     print(f'get_function, {lines[i]}')
-    return OK
-def get_user_function(program:Program,lines:list,i:int,lines_len:int) -> int:
+    return OK,i
+def parse_FUNCTION_CALL(program:Program,
+                           expression:list,
+                           lines:list,
+                           i:int,
+                           lines_len:int) -> (int,int):
     print(f'user_get_function, {lines[i]}')
-    return OK
+    return OK,i
 
 CODE_EXP = {
-    'v':get_variable,
-    'uv':get_user_variable,
-    'f':get_function,
-    'uf':get_user_function
+    'vd':parse_VARIABLE_DECLARE,
+    'vo':parse_VARIABLE_OPERATION,
+    'fs':parse_FUNCTION_SYSTEM,
+    'fd':parse_FUNCTION_DECLARE,
+    'fc':parse_FUNCTION_CALL
 }
 
-def parse_expression(program:Program,e_type:str,lines:list,i:int,lines_len:int) -> int:
-    return CODE_EXP[e_type](program=program,lines=lines,i=i,lines_len=lines_len)
+def parse_expression(program:Program,lines:list,i:int,lines_len:int) -> (int,int):
+    # Evaluate expression to prepare for builder
+    line = lines[i]
+    return_code,e_type,value = evaluate_expression(line)
+    if return_code == ERROR:
+        print(f'Error in evaluate_expression(): {e_type}. Expression value {value}')
+        return (ERROR,i)
+    expression = line.strip().split() # parse functions will pop one word/item at a time from the expression
+    expression.reverse() # reverse because effecient to pop from tail (instead of head)
+    print(f'{expression=}')
+    return CODE_EXP[e_type](program=program,
+                            expression=expression,
+                            lines=lines,
+                            i=i,
+                            lines_len=lines_len)
