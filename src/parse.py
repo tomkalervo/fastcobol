@@ -1,7 +1,7 @@
 
 
 import re
-from token import Token, TokenNode, compiled_regex, token_regex
+from token import Token, TokenNode, compiled_regex, token_regex, Tokenizer
 
 def tokenize(program_string):
     """
@@ -9,20 +9,29 @@ def tokenize(program_string):
     """
     # Tokenize the program string
     tokens = []
+    tkz = Tokenizer(program_string)
+    # for row,match in tkz:
+    #     print(f"{row}:\t{match=}")
+        
+    rcode, my_token = tkz.get_next_token()
+    print(f"{rcode=},{my_token=}")
+    tokens.append(my_token)
 
-    # Extract pattern strings from compiled regex objects
-    regex_patterns = list(token_regex.values())
-
-    # Create a combined regex pattern
-    combined_regex = '|'.join(regex_patterns)
-
+    while rcode == True:
+        rcode, my_token = tkz.get_next_token()
+        print(f"{rcode=},{my_token=}")
+        if my_token:
+            tokens.append(my_token)
+        else:
+            break
+        
     # Iterate over each token in the program string
-    for line_number, line in enumerate(program_string.split('\n')):
-        for match in re.finditer(combined_regex, line):
-            #print(f"{match=},{match.group()=},{line_number=}")
-            # Find the token type corresponding to the matched pattern
-            token_type = next(key for key, value in compiled_regex.items() if value.match(match.group()))
-            tokens.append(Token(token_type, match.group(), (line_number, match.start() + 1)))
+    # for line_number, line in enumerate(program_string.split('\n'),1):
+    #     for match in re.finditer(combined_regex, line):
+    #         print(f"{match=},{match.group()=},{line_number=}")
+    #         # Find the token type corresponding to the matched pattern
+    #         token_type = next(key for key, value in compiled_regex.items() if value.match(match.group()))
+    #         tokens.append(Token(token_type, match.group(), (line_number, match.start() + 1)))
 
     return tokens
 
@@ -44,6 +53,7 @@ PROGRAM example
     FUNC main
     {
         result = add(3, 4);
+        12ss = y;
         print "The result is: " + result;
     }
 }
@@ -58,3 +68,7 @@ for t in tokens:
 
 # Print the parse tree (or AST) to visualize the structure
 # print(parse_tree)
+
+# t = Tokenizer(example_program)
+# for row, match in t:
+#     print(f"{row}:\t{match=}")
