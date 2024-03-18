@@ -42,7 +42,8 @@ token_regex = {
     "assignment_statement": r"[a-zA-Z_][a-zA-Z0-9_]*=",  # Assuming identifiers for assignment
     "function_call": r"[a-zA-Z_][a-zA-Z0-9_]*\(",  # Assuming function names consist of letters and underscores
 }
-STOP_TOKEN = ['{','(,',')','}',',',';','=','-','+','*','/']
+STOP_TOKEN = ['{','(',')','}',',',';','=','-','+','*','/']
+QUOTE_TOKEN = ['"','\'']
 
 # Compile regular expressions
 compiled_regex = {token_name: re.compile(regex) for token_name, regex in token_regex.items()}
@@ -55,6 +56,9 @@ class Token:
 
     def __repr__(self):
         return f"Token({self._type}, {self._value}, {self._position})"
+    
+    def isProgram(self) -> bool:
+        return self.t_type == "PROGRAM"
 
 class TokenNode:
     def __init__(self, token):
@@ -77,18 +81,25 @@ class Tokenizer:
         if self._idx == self._end:
             return (0,None)
         
+        #discard whitespace, recursive to handle eof
         while self._string[self._idx].isspace():
-            print(f"{self._idx=},{self._string[self._idx]=}")
             self._idx += 1
+            return self.get_next_token()
+        
         idx_start = self._idx
         idx_stop = idx_start + 1
 
-        # TODO
-        # if self._string[self._idx] == '"':
-        
-        while self._string[idx_stop] not in STOP_TOKEN and not self._string[idx_stop].isspace():
-            print(f"{self._string[idx_stop]=}")
+        if self._string[self._idx] in STOP_TOKEN:
+            pass
+        elif self._string[self._idx] in QUOTE_TOKEN:
+            # parse string
+            qt = QUOTE_TOKEN.index(self._string[self._idx])
+            while self._string[idx_stop] != QUOTE_TOKEN[qt]:
+                idx_stop += 1
             idx_stop += 1
+        else:
+            while self._string[idx_stop] not in STOP_TOKEN and not self._string[idx_stop].isspace():
+                idx_stop += 1
             
         token_me = self._string[idx_start:idx_stop]
         token_type = get_match(token_me)
@@ -96,8 +107,7 @@ class Tokenizer:
         if token_type:
             return (1,Token(token_type,token_me,(idx_start,idx_stop)))
         else:
-            print(f"{token_me=}")
-            return (1,None)
+            return (2,Token("No token match",token_me,(idx_start,idx_stop)))
             
     def __iter__(self):
         return self

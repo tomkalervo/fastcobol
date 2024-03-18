@@ -1,17 +1,13 @@
-
-
 import re
 from token import Token, TokenNode, compiled_regex, token_regex, Tokenizer
 
-def tokenize(program_string):
+def tokenize(program_string) -> list():
     """
     Tokenize the input program string using regular expressions.
     """
     # Tokenize the program string
     tokens = []
     tkz = Tokenizer(program_string)
-    # for row,match in tkz:
-    #     print(f"{row}:\t{match=}")
         
     rcode, my_token = tkz.get_next_token()
     print(f"{rcode=},{my_token=}")
@@ -20,26 +16,28 @@ def tokenize(program_string):
     while rcode == True:
         rcode, my_token = tkz.get_next_token()
         print(f"{rcode=},{my_token=}")
-        if my_token:
+        if rcode == 1:
             tokens.append(my_token)
-        else:
+        elif rcode == 2:
+            print('error parsing')
+            print(f'{my_token=}')
             break
-        
-    # Iterate over each token in the program string
-    # for line_number, line in enumerate(program_string.split('\n'),1):
-    #     for match in re.finditer(combined_regex, line):
-    #         print(f"{match=},{match.group()=},{line_number=}")
-    #         # Find the token type corresponding to the matched pattern
-    #         token_type = next(key for key, value in compiled_regex.items() if value.match(match.group()))
-    #         tokens.append(Token(token_type, match.group(), (line_number, match.start() + 1)))
 
     return tokens
 
-def build_parse_tree(tokens):
+def build_parse_tree(tokens) -> TokenNode:
     """
     Build the parse tree or AST from the tokens.
     """
-    # TODO
+    program = None
+    tokens.reverse()
+    token = tokens.pop()
+    if token.isProgram():
+        program = TokenNode(token)
+    else:
+        print("Error, incorrect Program declaration")
+    
+    return program
 
 # Example program string
 example_program = """
@@ -64,7 +62,7 @@ tokens = tokenize(example_program)
 for t in tokens:
     print(t)
 # Build the parse tree or AST from the tokens
-# parse_tree = build_parse_tree(tokens)
+parse_tree = build_parse_tree(tokens)
 
 # Print the parse tree (or AST) to visualize the structure
 # print(parse_tree)
