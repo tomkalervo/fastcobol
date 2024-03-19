@@ -27,6 +27,7 @@ def get_match(string:str) -> str:
 token_regex = {
     "PROGRAM": r"PROGRAM",
     "FUNC": r"FUNC",
+    "RETURN": r"RETURN",
     "LPAREN": r"\(",
     "RPAREN": r"\)",
     "LBRACE" : r"\{",
@@ -37,7 +38,6 @@ token_regex = {
     "integer": r"\d+",
     "string_literal": r"\".*?\"",
     "operator": r"\+|-|\*|\/|=",  # Add more operators as needed
-    "RETURN": r"RETURN",
     "print_statement": r"print",
     "assignment_statement": r"[a-zA-Z_][a-zA-Z0-9_]*=",  # Assuming identifiers for assignment
     "function_call": r"[a-zA-Z_][a-zA-Z0-9_]*\(",  # Assuming function names consist of letters and underscores
@@ -53,17 +53,38 @@ class Token:
         self._type = t_type
         self._value = value
         self._position = position
-
+        
+    def get_type(self) -> str:
+        return self._type
+    
+    def get_value(self) -> str:
+        return self._value
+    
+    def get_position(self) -> str:
+        return self._position
+    
     def __repr__(self):
         return f"Token({self._type}, {self._value}, {self._position})"
     
-    def isProgram(self) -> bool:
-        return self.t_type == "PROGRAM"
+    def is_type(self,t_type) -> bool:
+        return self._type == t_type
 
 class TokenNode:
-    def __init__(self, token):
-        self._token = token
+    def __init__(self, t_type, position) -> None:
+        self._type = t_type
+        self._position = position
         self._children = []
+        self._parent = None
+        self._value = None
+        
+    def set_value(self, value) -> None:
+        self._value = value
+
+    def set_parent(self, parent:'TokenNode') -> None:
+        self._parent = parent
+        
+    def add_child(self, child:'TokenNode') -> None:
+        self._children.append(child)
         
     def __repr__(self):
         children_repr = ', '.join(repr(child) for child in self._children)
