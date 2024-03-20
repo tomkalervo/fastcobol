@@ -78,6 +78,8 @@ def _parse_new_node(parent_node,token,tokens) -> (int,str,TokenNode):
             print(f"no match, {token=}")
 
     return 1,"ok",TokenNode(t_type=token.get_type,position=token.get_position)
+
+
 # Example program string
 example_program = """
 PROGRAM example
