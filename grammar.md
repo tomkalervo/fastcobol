@@ -19,12 +19,12 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 <statement_list> ::= { <statement> } 
  
 <statement> ::= <assignment_statement> 
-              | <function_call>
+              | <function_call> SEMICOLON
  
 <assignment_statement> ::= <identifier> <operator> <expression> SEMICOLON 
 
 <function_call> ::= <identifier> 
-                    LPAREN <argument_list> RPAREN SEMICOLON 
+                    LPAREN <argument_list> RPAREN  
 
 <argument_list> ::= <expression> | <argument_list> COMMA <expression> 
  
