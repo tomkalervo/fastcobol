@@ -16,7 +16,10 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 
 ```<statement_list> ::= { <statement> }```
 
-```<statement> ::= <assignment_statement> | <function_call>```
+```
+<statement> ::= <assignment_statement> 
+              | <function_call>
+```
 
 ```<assignment_statement> ::= <identifier> <operator> <expression> SEMICOLON```
 
@@ -28,20 +31,19 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 <expression> ::= <term>
                | <expression> <operator> <term>
                | <function_call>
-
+```
+```
 <term> ::= <integer>
          | <identifier>
          | <string_literal>
-
-<integer> ::= <digit> | <integer> <digit>
-
-<identifier> ::= <letter> { <letter> | <digit> | '_' }
-<letter> ::= 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'
-<digit> ::= '0' | '1' | ... | '9'
-
-<operator> ::= '+' | '-' | '*' | '/'
-
 ```
+```<integer> ::= <digit> | <integer> <digit>```
+
+```<identifier> ::= <letter> { <letter> | <digit> | '_' }```
+```<letter> ::= 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'```
+```<digit> ::= '0' | '1' | ... | '9'```
+
+```<operator> ::= '+' | '-' | '*' | '/'```
 
 ```<string_literal> ::= '"' { <character> } '"'```
 ```<character> ::= <letter> | <digit> | <special_character>```
