@@ -2,10 +2,9 @@
 The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus?Naur_form). Developing fastcobol is an iterative process and the grammar will also be evaluated, modified and expanded during the process. It is a good reference to what is currently supported, or what will be supported in the coming release.
 
 ## fcbl alpha 0.1
-$ {
-<program> ::= PROGRAM <identifier> LBRACE <function_list> <statement_list> RBRACE
+```<program> ::= PROGRAM <identifier> LBRACE <function_list> <statement_list> RBRACE ```
 
-<function_list> ::= { <function> }
+```<function_list> ::= { <function> }```
 
 <function> ::= FUNC <identifier> LPAREN <parameter_list> RPAREN LBRACE <statement_list> <return_statement> RBRACE
 
@@ -44,4 +43,3 @@ $ {
 <string_literal> ::= '"' { <character> } '"'
 <character> ::= <letter> | <digit> | <special_character>
 <special_character> ::= any character except double quote '"'
-} $
