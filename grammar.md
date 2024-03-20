@@ -24,21 +24,24 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 
 ```<argument_list> ::= <expression> | <argument_list> COMMA <expression>```
 
-```<expression> ::= <term>
+```
+<expression> ::= <term>
                | <expression> <operator> <term>
-               | <function_call>```
+               | <function_call>
 
-```<term> ::= <integer>
+<term> ::= <integer>
          | <identifier>
-         | <string_literal>```
+         | <string_literal>
 
-```<integer> ::= <digit> | <integer> <digit>```
+<integer> ::= <digit> | <integer> <digit>
 
-```<identifier> ::= <letter> { <letter> | <digit> | '_' }```
-```<letter> ::= 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'```
-```<digit> ::= '0' | '1' | ... | '9'```
+<identifier> ::= <letter> { <letter> | <digit> | '_' }
+<letter> ::= 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'
+<digit> ::= '0' | '1' | ... | '9'
 
-```<operator> ::= '+' | '-' | '*' | '/'```
+<operator> ::= '+' | '-' | '*' | '/'
+
+```
 
 ```<string_literal> ::= '"' { <character> } '"'```
 ```<character> ::= <letter> | <digit> | <special_character>```
