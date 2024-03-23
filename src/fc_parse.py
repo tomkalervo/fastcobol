@@ -1,5 +1,5 @@
 import re
-from fc_token import Token
+from fc_token import Token,TokenType
 from fc_ast import Node,ProgramNode,FunctionNode,StatementNode
 
 def build_parse_tree(tokens) ->  Node:
@@ -8,13 +8,13 @@ def build_parse_tree(tokens) ->  Node:
     """
     tokens.reverse()
     token = tokens.pop()
-    if not token.is_type("PROGRAM"):
-        print(f"Expected PROGRAM, got {token=}")
+    if not token.is_type(TokenType.PROGRAM):
+        print(f"Expected {TokenType.PROGRAM=}, got {token=}")
         return None
     
     token = tokens.pop()
-    if not token.is_type("identifier"):
-        return 0,f"Expected identifier, got {token=}",None
+    if not token.is_type(TokenType.IDENTIFIER):
+        return 0,f"Expected {TokenType.IDENTIFIER}, got {token=}",None
     
     retcode,msg,program = _parse_program(
         tree_node=ProgramNode(value=token.get_value(),
@@ -32,8 +32,8 @@ def _parse_program(tree_node:Node,tokens:list) -> (int, str,  Node):
     # <program> ::= PROGRAM <identifier> LBRACE <statement_list> <function_list> RBRACE 
     
     token = tokens.pop()
-    if not token.is_type("LBRACE"):
-        return 0,f"Expected LBRACE, got {token=}",None
+    if not token.is_type(TokenType.LBRACE):
+        return 0,f"Expected {TokenType.LBRACE=}, got {token=}",None
     
     token = tokens.pop()
     function_list = []
@@ -50,26 +50,26 @@ def _parse_program(tree_node:Node,tokens:list) -> (int, str,  Node):
         else:
             _list.append(node)
             
-    while(not token.is_type("RBRACE")):
+    while(not token.is_type(TokenType.RBRACE)):
         match(token.get_type()):
-            case 'FUNC':
+            case TokenType.FUNC:
                 token = tokens.pop()
-                if not token.is_type("identifier"):
-                    return 0,f"Expected identifier, got {token=}",None
+                if not token.is_type(TokenType.IDENTIFIER):
+                    return 0,f"Expected {TokenType.IDENTIFIER=}, got {token=}",None
 
                 parse_next(func=_parse_function,
                            _list=function_list,
                            token=token,
                            Node_t=FunctionNode)
                     
-            case 'identifier':
+            case TokenType.IDENTIFIER:
                 parse_next(func=_parse_statement,
                            _list=statement_list,
                            token=token,
                            Node_t=StatementNode)
 
             case _:
-                return 0,f"Expected FUNC or identifier, got {token.get_type()=}",None        
+                return 0,f"Expected {TokenType.FUNC=} or {TokenType.IDENTIFIER=}, got {token.get_type()=}",None        
 
         token = tokens.pop()
             
@@ -81,25 +81,25 @@ def _parse_function(node:Node,tokens:list) -> (int,str, Node):
     #            LBRACE <statement_list> <return_statement> RBRACE    
     
     token = tokens.pop()
-    if not token.is_type("LPAREN"):
-        return 0,f"Expected LPAREN, got {token=}",None
+    if not token.is_type(TokenType.LPAREN):
+        return 0,f"Expected {TokenType.LPAREN=}, got {token=}",None
     
     print("Parameterlist:")
     print(f"{token=}")
     token = tokens.pop()
-    while(not token.is_type("RPAREN")):
+    while(not token.is_type(TokenType.RPAREN)):
         print(f"{token=}")
         token = tokens.pop()
     print(f"{token=}")
 
     token = tokens.pop()
-    if not token.is_type("LBRACE"):
-        return 0,f"Expected LPAREN, got {token=}",None
+    if not token.is_type(TokenType.LBRACE):
+        return 0,f"Expected {TokenType.LBRACE=}, got {token=}",None
     
     print("statementlist:")
     print(f"{token=}")
     token = tokens.pop()
-    while(not token.is_type("RBRACE")):
+    while(not token.is_type(TokenType.RBRACE)):
         print(f"{token=}")
         token = tokens.pop()
     print(f"{token=}")
@@ -127,13 +127,13 @@ def _parse_statement(node: Node,tokens:list) -> (int,str, Node):
     
     token = tokens.pop()
     match(token.get_type()):
-        case "operator":
-            print(f"Got assignment_statement {token=}")
-            while(not token.is_type("SEMICOLON")):
+        case TokenType.OPERATOR:
+            print(f"Got assignment statement: {TokenType.OPERATOR=} with {token=}")
+            while(not token.is_type(TokenType.SEMICOLON)):
                 token = tokens.pop()
-        case "LPAREN":
-            print(f"Got function call {token=}")
-            while(not token.is_type("RPAREN")):
+        case TokenType.LPAREN:
+            print(f"Got function call: {token=}")
+            while(not token.is_type(TokenType.RPAREN)):
                 token = tokens.pop()
         case _:
             print(f"bad match in parse statement {token=}")

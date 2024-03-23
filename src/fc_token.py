@@ -9,7 +9,7 @@ such as keywords, identifiers, literals, and punctuation symbols.
 
 Classes:
 - Token: Represents a single token with a type, value, and position in the source code.
-- TokenNode: Represents a node in a token-based abstract syntax tree (AST).
+- Tokenizer: Takes fastcobol code as a text string and break it down into tokens.
 
 Utilities:
 - token_regex: A dictionary mapping token names to regular expressions.
@@ -17,36 +17,50 @@ Utilities:
 
 """
 import re
+from enum import Enum,auto
 
-def get_match(string:str) -> str:
-    for token, regex in token_regex.items():
-        if re.match(regex, string):
-            return token
-    return None
-
-token_regex = {
-    "PROGRAM": r"PROGRAM",
-    "FUNC": r"FUNC",
-    "RETURN": r"RETURN",
-    "LPAREN": r"\(",
-    "RPAREN": r"\)",
-    "LBRACE" : r"\{",
-    "RBRACE" : r"\}",
-    "SEMICOLON": r";",
-    "COMMA": r",",
-    "identifier": r"[a-zA-Z_][a-zA-Z0-9_]*",
-    "integer": r"\d+",
-    "string_literal": r"\".*?\"",
-    "operator": r"\+|-|\*|\/|=",  # Add more operators as needed
-    "print_statement": r"print",
-    "assignment_statement": r"[a-zA-Z_][a-zA-Z0-9_]*=",  # Assuming identifiers for assignment
-    "function_call": r"[a-zA-Z_][a-zA-Z0-9_]*\(",  # Assuming function names consist of letters and underscores
-}
 STOP_TOKEN = ['{','(',')','}',',',';','=','-','+','*','/']
 QUOTE_TOKEN = ['"','\'']
-
 # Compile regular expressions
-compiled_regex = {token_name: re.compile(regex) for token_name, regex in token_regex.items()}
+# compiled_regex = {token_name: re.compile(regex) for token_name, regex in token_regex.items()}
+class TokenType(Enum):
+    PROGRAM = auto()
+    FUNC = auto()
+    RETURN_STATEMENT = auto()
+    LPAREN = auto()
+    RPAREN = auto()
+    LBRACE = auto()
+    RBRACE = auto()
+    SEMICOLON = auto()
+    COMMA = auto()
+    IDENTIFIER = auto()
+    INTEGER = auto()
+    STRING_LITERAL = auto()
+    OPERATOR = auto()
+    ASSIGN_STATEMENT = auto()
+    FUNC_CALL = auto()
+    def __repr__(self):
+        return "<%s.%s>" % (self.__class__.__name__, self._name_)
+    
+def get_regex() -> dict:
+    tt = TokenType
+    return {
+        tt.PROGRAM: r"PROGRAM",
+        tt.FUNC: r"FUNC",
+        tt.RETURN_STATEMENT: r"RETURN",
+        tt.LPAREN: r"\(",
+        tt.RPAREN: r"\)",
+        tt.LBRACE : r"\{",
+        tt.RBRACE : r"\}",
+        tt.SEMICOLON: r";",
+        tt.COMMA: r",",
+        tt.IDENTIFIER: r"[a-zA-Z_][a-zA-Z0-9_]*",
+        tt.INTEGER: r"\d+",
+        tt.STRING_LITERAL: r"\".*?\"",
+        tt.OPERATOR: r"\+|-|\*|\/|=", 
+        tt.ASSIGN_STATEMENT: r"[a-zA-Z_][a-zA-Z0-9_]*=", 
+        tt.FUNC_CALL: r"[a-zA-Z_][a-zA-Z0-9_]*\(",
+    }
 
 class Token:
     def __init__(self, t_type, value, position):
@@ -70,19 +84,24 @@ class Token:
         return self._type == t_type
      
 class Tokenizer:
-    def __init__(self, string):
+    def __init__(self,string:str) -> None:
         self._string = string
-        self._iter = re.finditer('|'.join(token_regex.values()), string)
         self._end = len(self._string)
         self._idx = 0
-        self._current_row = 0
+        self._current_row = 1 # 1-index rows
+        self._token_regex = get_regex()
         
     def get_next_token(self) -> 'Token':
         if self._idx == self._end:
             return (0,None)
-        
+        else:
+            pass
         #discard whitespace, recursive to handle eof
         while self._string[self._idx].isspace():
+            if self._string[self._idx] == '\n':
+                self._current_row += 1
+            else:
+                pass
             self._idx += 1
             return self.get_next_token()
         
@@ -102,22 +121,20 @@ class Tokenizer:
                 idx_stop += 1
             
         token_me = self._string[idx_start:idx_stop]
-        token_type = get_match(token_me)
+        
+        token_type = None
+        for token, regex in self._token_regex.items():
+            if re.match(regex, token_me):
+                token_type = token
+                break
+            else:
+                pass
+                
         self._idx = idx_stop
         if token_type:
-            return (1,Token(token_type,token_me,(idx_start,idx_stop)))
+            return (1,Token(token_type,token_me,self._current_row))
         else:
-            return (2,Token("No token match",token_me,(idx_start,idx_stop)))
-            
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        match = next(self._iter)
-        end = match.end()
-        self._current_row += self._string.count('\n', self._idx, end)
-        self._idx = end
-        return (self._current_row, match)
+            return (2,Token("No token match",token_me,self._current_row))
 
 def tokenize(program_string,verbose=True) -> (int, str, list()):
     """
