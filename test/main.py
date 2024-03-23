@@ -23,8 +23,8 @@ def test_1():
         print(parse_tree)
     else:
         print('End with failure: ', return_msg)
-    for t in tokens:
-        print(t)
+    # for t in tokens:
+    #     print(t)
 
 def main() -> int:
     try:

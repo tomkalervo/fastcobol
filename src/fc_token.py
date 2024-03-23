@@ -37,7 +37,7 @@ class TokenType(Enum):
     INTEGER = auto()
     STRING_LITERAL = auto()
     OPERATOR = auto()
-    ASSIGN_STATEMENT = auto()
+    ASSIGNMENT = auto()
     FUNC_CALL = auto()
     def __repr__(self):
         return "<%s.%s>" % (self.__class__.__name__, self._name_)
@@ -54,12 +54,13 @@ def get_regex() -> dict:
         tt.RBRACE : r"\}",
         tt.SEMICOLON: r";",
         tt.COMMA: r",",
-        tt.IDENTIFIER: r"[a-zA-Z_][a-zA-Z0-9_]*",
         tt.INTEGER: r"\d+",
+        tt.ASSIGNMENT: r"=",
+        # tt.FUNC_CALL: r"[a-zA-Z_][a-zA-Z0-9_]*\(",
+        # tt.ASSIGNMENT_STATEMENT: r"[a-zA-Z_][a-zA-Z0-9_]*=",
+        tt.IDENTIFIER: r"[a-zA-Z_][a-zA-Z0-9_]*",
         tt.STRING_LITERAL: r"\".*?\"",
-        tt.OPERATOR: r"\+|-|\*|\/|=", 
-        tt.ASSIGN_STATEMENT: r"[a-zA-Z_][a-zA-Z0-9_]*=", 
-        tt.FUNC_CALL: r"[a-zA-Z_][a-zA-Z0-9_]*\(",
+        tt.OPERATOR: r"\+|-|\*|\/", 
     }
 
 class Token:

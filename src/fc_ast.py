@@ -38,22 +38,31 @@ class ProgramNode(Node):
 class FunctionNode(Node):
     def __init__(self,value,position,parent,parameter_list=[],statement_list=[],return_statement=None):
         super().__init__(value=value,position=position,parent=parent)
-        self.parameter_list = parameter_list
-        self.statement_list = statement_list
-        self.return_statement = return_statement
+        self._parameter_list = parameter_list
+        self._statement_list = statement_list
+        self._return_statement = return_statement
+        
+    def add_parameter(self, parameter:'Node'):
+        self._parameter_list.append(parameter)
+        
+    def add_statement(self, statement:'Node'):
+        self._statement_list.append(statement)
+        
+    def add_return_statement(self, return_statement:'Node'):
+        self._return_statement = return_statement
         
     def get_parameter_list(self) -> list:
-        return self.parameter_list
+        return self._parameter_list
     
     def get_statement_list(self) -> list:
-        return self.statement_list
+        return self._statement_list
     
     def get_return_statement(self) -> 'Node':
-        self.return_statement
+        self._return_statement
         
     def __repr__(self) -> str:
         context = super().__repr__()
-        return f"{context}, {self.parameter_list=}, {self.statement_list=}, {self.return_statement=}"
+        return f"{context}, {self._parameter_list=}, {self._statement_list=}, {self._return_statement=}"
     
 class StatementNode(Node):
     def __init__(self,value,position,parent):
@@ -62,3 +71,16 @@ class StatementNode(Node):
     def __repr__(self) -> str:
         context = super().__repr__()
         return f"{context}"
+    
+class ReturnNode(Node):
+    def __init__(self,value,position,parent,expression=None):
+        super().__init__(value=value,position=position,parent=parent)
+        self._expression=expression
+        
+    def __repr__(self) -> str:
+        context = super().__repr__()
+        return f"{context},{self._expression=}"
+    
+class IdentifierNode(Node):
+    def __init__(self,value,position,parent):
+        super().__init__(value=value,position=position,parent=parent)

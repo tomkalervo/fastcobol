@@ -35,7 +35,8 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 <statement> ::= <assignment_statement> SEMICOLON
               | <function_call> SEMICOLON
  
-<assignment_statement> ::= <identifier> <operator> <expression> 
+<assignment_statement> ::= <identifier> <assignment> <operator> <expression> 
+<assignment> ::= '='
 
 <function_call> ::= <identifier> 
                     LPAREN <argument_list> RPAREN  
@@ -62,4 +63,3 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
  <character> ::= <letter> | <digit> | <special_character> 
  <special_character> ::= any character except double quote '"'
 ```
- 
