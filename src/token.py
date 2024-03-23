@@ -68,28 +68,7 @@ class Token:
     
     def is_type(self,t_type) -> bool:
         return self._type == t_type
-
-class TokenNode:
-    def __init__(self, t_type, position) -> None:
-        self._type = t_type
-        self._position = position
-        self._children = []
-        self._parent = None
-        self._value = None
-        
-    def set_value(self, value) -> None:
-        self._value = value
-
-    def set_parent(self, parent:'TokenNode') -> None:
-        self._parent = parent
-        
-    def add_child(self, child:'TokenNode') -> None:
-        self._children.append(child)
-        
-    def __repr__(self):
-        children_repr = ', '.join(repr(child) for child in self._children)
-        return f"TokenNode({repr(self._token)}, children=[{children_repr}])"
-        
+     
 class Tokenizer:
     def __init__(self, string):
         self._string = string

@@ -3,7 +3,7 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 
 ## fcbl alpha 0.1
 ```
-<program> ::= PROGRAM <identifier> LBRACE <function_list> <statement_list> RBRACE 
+<program> ::= PROGRAM <identifier> LBRACE <statement_list> <function_list> RBRACE 
 
 <function_list> ::= { <function> } 
 <function> ::= FUNC <identifier> 
@@ -18,10 +18,10 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 
 <statement_list> ::= { <statement> } 
  
-<statement> ::= <assignment_statement> 
+<statement> ::= <assignment_statement> SEMICOLON
               | <function_call> SEMICOLON
  
-<assignment_statement> ::= <identifier> <operator> <expression> SEMICOLON 
+<assignment_statement> ::= <identifier> <operator> <expression> 
 
 <function_call> ::= <identifier> 
                     LPAREN <argument_list> RPAREN  
