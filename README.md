@@ -12,7 +12,7 @@ After that, a list with features will be evaluated and prioritezed. And the road
 
 In the far future I hope to be able to add/import cobol copys, external function calls, settings for different policies and maybe even try to implement OOP.
 
-## Grammar for fastcobol
+## grammar
 The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus?Naur_form). Developing fastcobol is an iterative process and the grammar will also be evaluated, modified and expanded during the process. It is a good reference to what is currently supported, or what will be supported in the coming release.
 
 ### alpha 0.2
