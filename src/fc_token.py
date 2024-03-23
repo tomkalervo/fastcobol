@@ -118,3 +118,30 @@ class Tokenizer:
         self._current_row += self._string.count('\n', self._idx, end)
         self._idx = end
         return (self._current_row, match)
+
+def tokenize(program_string,verbose=True) -> (int, str, list()):
+    """
+    Tokenize the input program string using regular expressions.
+    """
+    # Tokenize the program string
+    tokens = []
+    tkz = Tokenizer(program_string)
+        
+    rcode, my_token = tkz.get_next_token()
+    if verbose:
+        print(f"{rcode=},{my_token=}")
+    tokens.append(my_token)
+
+    while rcode == True:
+        rcode, my_token = tkz.get_next_token()
+        if verbose:
+            print(f"{rcode=},{my_token=}")
+        if rcode == 1:
+            tokens.append(my_token)
+        elif rcode == 2:
+            if verbose:
+                print('error parsing')
+                print(f'{my_token=}')
+            return (0,f'Error tokenize {my_token=}',None)
+
+    return (1,'ok',tokens)

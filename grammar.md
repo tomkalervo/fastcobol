@@ -1,7 +1,7 @@
 # Grammar for fastcobol
 The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus?Naur_form). Developing fastcobol is an iterative process and the grammar will also be evaluated, modified and expanded during the process. It is a good reference to what is currently supported, or what will be supported in the coming release.
 
-## fcbl alpha 0.1
+## alpha 0.2
 ```
 <program> ::= PROGRAM <identifier> LBRACE <statement_list> <function_list> RBRACE 
 
