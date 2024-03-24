@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self,value,position,parent=None) -> None:
+    def __init__(self,position,value=None,parent=None) -> None:
         self._position = position
         self._parent = parent
         self._value = value
@@ -17,7 +17,7 @@ class Node:
         return self._value
         
     def __repr__(self) -> str:
-        return f"Node type={type(self)}({self._value=}, {self._parent=})"
+        return f"Node type={type(self)}({self._value=})"
    
 class ProgramNode(Node):
     def __init__(self,value,position,function_list=[],statement_list=[]) -> None:
@@ -65,9 +65,16 @@ class FunctionNode(Node):
         return f"{context}, {self._parameter_list=}, {self._statement_list=}, {self._return_statement=}"
     
 class StatementNode(Node):
-    def __init__(self,value,position,parent):
+    def __init__(self,value,position,parent,statement=None):
         super().__init__(value=value,position=position,parent=parent)
+        self._child=statement
         
+    def set_statement(self,statement):
+        self._child=statement
+        
+    def get_statement(self):
+        return self._child
+    
     def __repr__(self) -> str:
         context = super().__repr__()
         return f"{context}"
@@ -84,3 +91,62 @@ class ReturnNode(Node):
 class IdentifierNode(Node):
     def __init__(self,value,position,parent):
         super().__init__(value=value,position=position,parent=parent)
+        
+class BinaryOperationNode(Node):
+    def __init__(self,value,position,operator,left=None,right=None):
+        super().__init__(value=value,position=position,parent=parent)
+        self._operator = operator
+        self._left = left
+        self._right = right
+        
+class FunctionCallNode(Node):
+    def __init__(self,position,parent,value,argument_list=None):
+        super().__init__(value=value,
+                         position=position,
+                         parent=parent)
+        self._argument_list = argument_list
+        
+    def add_argument(self, argument:'Node'):
+        self._argument_list.append(argument)
+        
+    def get_argument_list(self):
+        return self._argument_list      
+    
+class ExpressionNode(Node):
+    def __init__(self,position,parent,value):
+        super().__init__(value=value,
+                         position=position,
+                         parent=parent)
+        self._operator = None
+        self._expression_left = None 
+        self._expression_right = None 
+        
+    def set_operator(self,op):
+        self._operator = op
+    def set_expression_left(self,exp):
+        self._expression_left = exp 
+    def set_expression_right(self,exp):
+        self._expression_right = exp 
+        
+    def get_operator(self):
+        return self._operator
+    def get_expression_left(self):
+        return self._expression_left
+    def get_expression_right(self):
+        return self._expression_right 
+    
+    def __repr__(self) -> str:
+        context = super().__repr__()
+        
+        return f"{context},{self._expression_left=},{self._operator=},{self._expression_right=}"
+
+class TermNode(Node):
+    def __init__(self,value,position,parent,term=None):
+        super().__init__(value=value,position=position,parent=parent)
+        self._term=token
+        
+    def set_term(self,term):
+        self._term=term
+        
+    def get_term(self):
+        return self._term

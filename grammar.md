@@ -31,7 +31,9 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
  
 <expression> ::= <term>
                | <expression> <operator> <term>
+               | <term> <operator> <expression>  
                | <function_call>
+               | LPAREN <expression> RPAREN
   
 <term> ::= <integer>
          | <identifier>
