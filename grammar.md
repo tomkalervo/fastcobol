@@ -21,7 +21,7 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 <statement> ::= <assignment_statement> SEMICOLON
               | <function_call> SEMICOLON
  
-<assignment_statement> ::= <identifier> <assignment> <operator> <expression> 
+<assignment_statement> ::= <identifier> <assignment> <expression> 
 <assignment> ::= '='
 
 <function_call> ::= <identifier> 

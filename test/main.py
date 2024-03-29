@@ -3,7 +3,38 @@ import sys,os
 #from objects import*
 
 def test_2():
-    print("no test 2")
+    from fc_ast import Program,Statement,StatementType,Expression,Terminal,TerminalType,Operator
+
+    def get_structure() -> Program:
+        p = Program(value="MY-PROG")
+        
+        # x = 5 + 3
+        x = Terminal(position=1,value="x",terminal_type=TerminalType.IDENTIFIER)
+        int_5 = Terminal(position=1,value="5",terminal_type=TerminalType.INTEGER)
+        int_3 = Terminal(position=1,value="3",terminal_type=TerminalType.INTEGER)
+        # print(f"{x=}\n{int_5=}\n{int_3=}")
+        
+        exp1 = Expression(expression_left=int_5,expression_right=int_3,operator=Operator.ADD)
+        # print(exp1)
+        
+        ass1 = Statement(statement=exp1,statement_type=StatementType.ASSIGNMENT,value=x)
+        # print(ass1)
+        
+        p.add_statement(ass1)
+        
+        exp2 = Expression(expression_left=int_5,expression_right=int_3,operator=Operator.SUB)
+        # print(exp1)
+        
+        ass2 = Statement(statement=exp2,statement_type=StatementType.ASSIGNMENT,value=x)
+        # print(ass1)
+        
+        p.add_statement(ass2)
+
+        return p
+    
+    prog = get_structure()
+    print(prog)
+    print("done")
 
 def test_1():
     return_code = None
@@ -28,8 +59,8 @@ def test_1():
 
 def main() -> int:
     try:
-        import fc_token,fc_parse
-        print(f"Module {fc_token} imported successfully!")
+        import fc_token,fc_parse,fc_ast
+        print(f"Module {fc_token},{fc_parse},{fc_ast} imported successfully!")
     except ImportError:
         print("Failed to import 'example_module'")
     print('='*20,'test1','='*20)
