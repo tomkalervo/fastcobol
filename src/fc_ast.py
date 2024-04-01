@@ -32,14 +32,18 @@ class Program():
                f">Functions:\n{[f for f in self.function_list]}"
    
 class Function():
-    def __init__(self,value=None,parameter_list=[],statement_list=[],return_statement=None):
+    def __init__(self,position,value=None,parameter_list=[],statement_list=[],return_statement=None):
+        self._position = position
         self._value = value
         self._parameter_list = parameter_list
         self._statement_list = statement_list
         self._return_statement = return_statement
         
+    def get_position():
+        return self._position
+    
     def set_value(self,value):
-        self._value=value
+        self._value = value
         
     def get_value(self):
         return self._value
@@ -63,7 +67,14 @@ class Function():
         self._return_statement
         
     def __repr__(self) -> str:
-        return f"{self._value}, {self._parameter_list=}, {self._statement_list=}, {self._return_statement=}"
+        parameters = [p.get_value() for p in self._parameter_list]
+        statements = ""
+        for stmt in self._statement_list:
+            statements += f"{stmt.get_statement_type()},{stmt.get_value()},{stmt.get_statement()}\n" 
+        if self._return_statement:
+            statements += f"{self._return_statement.get_statement_type()},{self._return_statement.get_statement()}\n"
+        return f"{self._value}{parameters}:\n" \
+               f"{statements}"
 
 class StatementType(Enum):
     ASSIGNMENT = auto()
@@ -72,11 +83,15 @@ class StatementType(Enum):
     EXIT = auto()
     
 class Statement():
-    def __init__(self,statement_type=None,statement=None,value=None):
+    def __init__(self,position,statement_type=None,statement=None,value=None):
+        self._position = position
         self._statement=statement
         self._type=statement_type
         self._value = value
         
+    def get_position():
+        return self._position
+    
     def set_statement(self,statement):
         self._statement=statement
 
@@ -111,8 +126,7 @@ class Statement():
             return f"{self._type}(\n{self._statement}\n)"
         
 class FunctionCall():
-    def __init__(self,value:str,argument_list=[]):
-        self._value = value
+    def __init__(self,argument_list=[]):
         self._argument_list = argument_list
         
     def add_argument(self, argument):
@@ -120,18 +134,35 @@ class FunctionCall():
         
     def get_argument_list(self):
         return self._argument_list      
-
+    
+    def __repr__(self) -> str:
+        return f"{[a for a in self._argument_list]}"
+    
 class Operator(Enum):
     ADD = auto()
     SUB = auto()
     MUL = auto()
     DIV = auto()
     
+    def get_type(op:str)->(int,'Operator'):
+        match(op):
+            case '+':
+                return True,Operator.ADD
+            case '-':
+                return True,Operator.SUB
+            case '*':
+                return True,Operator.MUL
+            case '/':
+                return True,Operator.DIV
+            case _:
+                return False,None
+               
 class Expression():
-    def __init__(self,expression_left=None,expression_right=None,operator:Operator=None):
+    def __init__(self,expression_left=None,expression_right=None,operator:Operator=None,sub_exp=False):
         self._op = operator
         self._exp_left = expression_left
         self._exp_right = expression_right 
+        self._sub_exp = sub_exp
         
     def set_operator(self,operator:Operator):
         self._op = operator
@@ -146,6 +177,8 @@ class Expression():
         return self._exp_left
     def get_expression_right(self):
         return self._exp_right 
+    def is_sub_exp() -> bool:
+        return self._sub_exp
     
     def __repr__(self) -> str:        
         left = ""
@@ -154,14 +187,14 @@ class Expression():
         right = ""
         for e in self._exp_right.__repr__().split():
             right += '-' + e + '\n'
-        return f"{self.__class__.__name__}:\n{left}\n-{self._op}\n{right}\n"
+        return f"{self.__class__.__name__}:\n{left}-{self._op}\n{right}"
 
 class TerminalType(Enum):
     INTEGER = auto()
     FLOAT = auto()
     STRING = auto()
-    LPAREN = auto()
-    RPAREN = auto()
+    # LPAREN = auto()
+    # RPAREN = auto()
     IDENTIFIER = auto()
     
 class Terminal():

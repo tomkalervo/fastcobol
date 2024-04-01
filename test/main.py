@@ -17,7 +17,7 @@ def test_2():
         exp1 = Expression(expression_left=int_5,expression_right=int_3,operator=Operator.ADD)
         # print(exp1)
         
-        ass1 = Statement(statement=exp1,statement_type=StatementType.ASSIGNMENT,value=x)
+        ass1 = Statement(position=1,statement=exp1,statement_type=StatementType.ASSIGNMENT,value=x)
         # print(ass1)
         
         p.add_statement(ass1)
@@ -29,7 +29,7 @@ def test_2():
         exp2 = Expression(expression_left=x,expression_right=float_1_2,operator=Operator.MUL)
         print(exp2)
         
-        ass2 = Statement(statement=exp2,statement_type=StatementType.ASSIGNMENT,value=y)
+        ass2 = Statement(position=2,statement=exp2,statement_type=StatementType.ASSIGNMENT,value=y)
         print(ass2)
         
         p.add_statement(ass2)
@@ -39,7 +39,7 @@ def test_2():
         int_2 = Terminal(position=3,value="2",terminal_type=TerminalType.INTEGER)
         exp3 = Expression(expression_left=x,expression_right=int_2,operator=Operator.SUB)
         exp4 = Expression(expression_left=y,expression_right=exp3,operator=Operator.DIV)
-        ass3 = Statement(statement=exp4,statement_type=StatementType.ASSIGNMENT,value=z)
+        ass3 = Statement(position=3,statement=exp4,statement_type=StatementType.ASSIGNMENT,value=z)
         p.add_statement(ass3)
         
         return p
@@ -59,11 +59,18 @@ def test_1():
     if return_code:
         print('End with success: ', return_msg)
         # Build the parse tree or AST from the tokens
-        from fc_parse import build_parse_tree
+        from fc_parse import parse
         print('___' * 30)
-        parse_tree = build_parse_tree(tokens)
+        return_code,message,ast_prog = parse(tokens)
         print('AST COMPLETE')
-        print(parse_tree)
+        if return_code:
+            print("Parse success:")
+            print(ast_prog)
+            print("-*"*10,"Functions")
+            for f in ast_prog.get_function_list():
+                print(f"{f=}")
+        else:
+            print(f'Parse fail: {message}')
     else:
         print('End with failure: ', return_msg)
     # for t in tokens:
@@ -77,8 +84,8 @@ def main() -> int:
         print("Failed to import 'example_module'")
     print('='*20,'test1','='*20)
     test_1()
-    print('='*20,'test2','='*20)
-    test_2()
+    # print('='*20,'test2','='*20)
+    # test_2()
     return 1
     
 if __name__ == '__main__':

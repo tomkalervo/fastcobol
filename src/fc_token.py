@@ -35,6 +35,7 @@ class TokenType(Enum):
     COMMA = auto()
     IDENTIFIER = auto()
     INTEGER = auto()
+    FLOAT = auto()
     STRING_LITERAL = auto()
     OPERATOR = auto()
     ASSIGNMENT = auto()
