@@ -22,14 +22,26 @@ def test_2():
         
         p.add_statement(ass1)
         
-        exp2 = Expression(expression_left=int_5,expression_right=int_3,operator=Operator.SUB)
-        # print(exp1)
+        # y = x * 1.2
+        y = Terminal(position=2,value="y",terminal_type=TerminalType.IDENTIFIER)
+        float_1_2 = Terminal(position=2,value="1.2",terminal_type=TerminalType.FLOAT)
+
+        exp2 = Expression(expression_left=x,expression_right=float_1_2,operator=Operator.MUL)
+        print(exp2)
         
-        ass2 = Statement(statement=exp2,statement_type=StatementType.ASSIGNMENT,value=x)
-        # print(ass1)
+        ass2 = Statement(statement=exp2,statement_type=StatementType.ASSIGNMENT,value=y)
+        print(ass2)
         
         p.add_statement(ass2)
 
+        # z = y / (x - 2)
+        z = Terminal(position=3,value="z",terminal_type=TerminalType.IDENTIFIER)
+        int_2 = Terminal(position=3,value="2",terminal_type=TerminalType.INTEGER)
+        exp3 = Expression(expression_left=x,expression_right=int_2,operator=Operator.SUB)
+        exp4 = Expression(expression_left=y,expression_right=exp3,operator=Operator.DIV)
+        ass3 = Statement(statement=exp4,statement_type=StatementType.ASSIGNMENT,value=z)
+        p.add_statement(ass3)
+        
         return p
     
     prog = get_structure()

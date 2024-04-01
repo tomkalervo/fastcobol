@@ -103,9 +103,9 @@ class Statement():
     
     def __repr__(self) -> str:
         if self.get_statement_type() == StatementType.ASSIGNMENT:
-            string_rep = f"{self._type}\n{'-'*2}{self._value} ="
+            string_rep = f"{self._type}\n{'-'}{self._value} :="
             for line in self._statement.__repr__().split():
-                string_rep += f"\n{'-'*4}{line}"
+                string_rep += f"\n{'-'*2}{line}"
             return string_rep + '\n'
         else:
             return f"{self._type}(\n{self._statement}\n)"
@@ -148,7 +148,13 @@ class Expression():
         return self._exp_right 
     
     def __repr__(self) -> str:        
-        return f"{self.__class__.__name__}\n\t{self._exp_left}\n\t{self._op}\n\t{self._exp_right}"
+        left = ""
+        for e in self._exp_left.__repr__().split():
+            left += '-' + e + '\n'
+        right = ""
+        for e in self._exp_right.__repr__().split():
+            right += '-' + e + '\n'
+        return f"{self.__class__.__name__}:\n{left}\n-{self._op}\n{right}\n"
 
 class TerminalType(Enum):
     INTEGER = auto()
@@ -180,4 +186,4 @@ class Terminal():
         return self._position
         
     def __repr__(self) -> str:
-        return f"Terminal({self._type},{self._value=},{self._position=})"
+        return f"Terminal({self._type},{self._value},{self._position})"
