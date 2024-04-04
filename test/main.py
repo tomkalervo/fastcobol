@@ -65,10 +65,11 @@ def test_1():
         print('AST COMPLETE')
         if return_code:
             print("Parse success:")
-            print(ast_prog)
-            print("-*"*10,"Functions")
-            for f in ast_prog.get_function_list():
-                print(f"{f=}")
+            assert(ast_prog.get_function_list()[1].get_statement_list() != ast_prog.get_function_list()[0].get_statement_list())
+
+            print(f"{ast_prog=}")
+            # for f in ast_prog.get_function_list():
+            #     print(f"{f=}")
         else:
             print(f'Parse fail: {message}')
     else:

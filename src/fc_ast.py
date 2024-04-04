@@ -32,11 +32,11 @@ class Program():
                f">Functions:\n{[f for f in self.function_list]}"
    
 class Function():
-    def __init__(self,position,value=None,parameter_list=[],statement_list=[],return_statement=None):
+    def __init__(self,position,value=None,parameter_list=None,statement_list=None,return_statement=None):
         self._position = position
         self._value = value
-        self._parameter_list = parameter_list
-        self._statement_list = statement_list
+        self._parameter_list = parameter_list or []
+        self._statement_list = statement_list or []
         self._return_statement = return_statement
         
     def get_position():
@@ -70,7 +70,7 @@ class Function():
         parameters = [p.get_value() for p in self._parameter_list]
         statements = ""
         for stmt in self._statement_list:
-            statements += f"{stmt.get_statement_type()},{stmt.get_value()},{stmt.get_statement()}\n" 
+            statements += f"{stmt.get_statement_type()},{stmt.get_value()}:\n{stmt.get_statement()}\n" 
         if self._return_statement:
             statements += f"{self._return_statement.get_statement_type()},{self._return_statement.get_statement()}\n"
         return f"{self._value}{parameters}:\n" \
@@ -126,17 +126,21 @@ class Statement():
             return f"{self._type}(\n{self._statement}\n)"
         
 class FunctionCall():
-    def __init__(self,argument_list=[]):
-        self._argument_list = argument_list
+    def __init__(self,value:str,argument_list=None):
+        self._value = value
+        self._argument_list = argument_list or []
         
     def add_argument(self, argument):
         self._argument_list.append(argument)
         
+    def get_value(self) -> str:
+        return self._value
+    
     def get_argument_list(self):
         return self._argument_list      
     
     def __repr__(self) -> str:
-        return f"{[a for a in self._argument_list]}"
+        return f"({self._value}:{[a for a in self._argument_list]})"
     
 class Operator(Enum):
     ADD = auto()
@@ -182,12 +186,21 @@ class Expression():
     
     def __repr__(self) -> str:        
         left = ""
-        for e in self._exp_left.__repr__().split():
-            left += '-' + e + '\n'
         right = ""
-        for e in self._exp_right.__repr__().split():
-            right += '-' + e + '\n'
-        return f"{self.__class__.__name__}:\n{left}-{self._op}\n{right}"
+        
+        if self._exp_left.__class__ == self.__class__:
+            for line in self._exp_left.__repr__().split('\n'):
+                left += '-' + line + '\n'
+        else:
+            left = self._exp_left
+            
+        if self._exp_right.__class__ == self.__class__:
+            for line in self._exp_right.__repr__().split('\n'):
+                right += '-' + line + '\n'
+        else:
+            right = self._exp_right
+            
+        return f"{self.__class__.__name__}:\n{left}\n{self._op}\n{right}"
 
 class TerminalType(Enum):
     INTEGER = auto()

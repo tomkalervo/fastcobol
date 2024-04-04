@@ -36,13 +36,10 @@ def _parse_program(program:Program,tokens:list) -> (int, str):
         msg = None
         match(token.get_type()):
             case tt.FUNC:
-                # token = tokens.pop()
                 fun = Function(position=token.get_position())
                 program.add_function(function=fun)
                 retcode,msg = _parse_function(function=fun,
-                                              tokens=tokens)
-                print(f"at parse program, <- parse function: {msg}")
-                    
+                                              tokens=tokens)                    
             case tt.IDENTIFIER:
                 stmt = Statement(position=token.get_position(),
                                  value=token.get_value())
@@ -73,12 +70,11 @@ def _parse_function(function:Function,tokens:list) -> (int,str):
     else:
         function.set_value(token.get_value())
         
-    print(f"At _parse_function: {function.get_value()}")
-
     token = tokens.pop()
     if not token.is_type(tt.LPAREN):
         return False,f"Error in {_parse_function.__qualname__}. Expected {tt.LPAREN=}, got {token=}"
     
+    # Get parameters
     token = tokens.pop()
     while(not token.is_type(tt.RPAREN)):
         match(token.get_type()):
@@ -99,12 +95,12 @@ def _parse_function(function:Function,tokens:list) -> (int,str):
     if not token.is_type(tt.LBRACE):
         return False,f"Error in {_parse_function.__qualname__}. Expected {tt.LBRACE=}, got {token=}"
     
+    # Get Statements
     token = tokens.pop()
     while(not token.is_type(tt.RBRACE)):
         retcode = False
         msg = ""
         statement = Statement(position=token.get_value())
-        
         match(token.get_type()):
             case tt.IDENTIFIER:
                 statement.set_value(token.get_value())
@@ -115,7 +111,6 @@ def _parse_function(function:Function,tokens:list) -> (int,str):
                 expression = Expression()
                 statement.set_statement(expression)
                 retcode,msg = _parse_expression(expression=expression,tokens=tokens) 
-                print(f"At parse function <- parse expression: {msg}")
                 
             case _:
                 msg = f"Error in {_parse_function.__qualname__}. Invalid start of statement, got {token=}"
@@ -132,7 +127,6 @@ def _parse_statement(statement:Statement,tokens:list) -> (int,str):
     # <statement> ::= <assignment_statement> | <function_call> SEMICOLON
     #   <assignment_statement> ::= <identifier> <operator> <expression> SEMICOLON 
     #   <function_call> ::= <identifier> LPAREN <argument_list> RPAREN              
-    print("At _parse_statement")
     token = tokens.pop()
     match(token.get_type()):
         case tt.ASSIGNMENT:
@@ -146,7 +140,7 @@ def _parse_statement(statement:Statement,tokens:list) -> (int,str):
 
         case tt.LPAREN:
             statement.set_statement_type(StatementType.FUNCTION_CALL)
-            function_call = FunctionCall()
+            function_call = FunctionCall(value=statement.get_value())
             statement.set_statement(function_call)
             _parse_function_call(function_call,tokens)
             token = tokens.pop()
@@ -158,8 +152,8 @@ def _parse_statement(statement:Statement,tokens:list) -> (int,str):
             return False, f"No match in parse statement: {token=}"
 
     return True,"ok"
-# TODO: refactor
-def _parse_expression(expression:Expression,tokens:list)->(int,str):
+
+def _parse_expression(expression:Expression,tokens:list) -> (int,str):
     # <expression> ::= <term>
     #             | <expression> <operator> <term>
     #             | <term> <operator> <expression>  
@@ -210,50 +204,80 @@ def _parse_expression(expression:Expression,tokens:list)->(int,str):
                 msg = f"Error at {_parse_expression.__qualname__}: No matching operator in {token}"
                 return False, msg
         
-        case tt.IDENTIFIER:  # Terminal or function_call 
-            if tokens[-1].is_type(tt.LPAREN):
-                # statement.set_statement_type(StatementType.FUNCTION_CALL)
-                function_call = FunctionCall()
-                # statement.set_statement(function_call)
+        case tt.IDENTIFIER if tokens[-1].is_type(tt.LPAREN): # Function call
+                tokens.pop() # drop LPAREN
+                function_call = FunctionCall(value=token.get_value())
                 expression.set_expression_left(function_call)
                 _parse_function_call(function_call,tokens)
-            else:
-                expression.set_expression_left(
-                    Terminal(terminal_type=TerminalType.IDENTIFIER,
-                             value=token.get_value(),
-                             position=token.get_position()))
-        
-        case tt.INTEGER:
-            expression.set_expression_left(Terminal(terminal_type=TerminalType.INTEGER,
-                                                    value=token.get_value(),
-                                                    position=token.get_position()))
-        
-        case tt.FLOAT:
-            expression.set_expression_left(Terminal(terminal_type=TerminalType.INTEGER,
-                                                    value=token.get_value(),
-                                                    position=token.get_position()))
-        
-        case tt.STRING_LITERAL:
-            expression.set_expression_left(Terminal(terminal_type=TerminalType.STRING,
-                                                    value=token.get_value(),
-                                                    position=token.get_position()))
-        case _:
-            msg = f"Error at {_parse_expression.__qualname__}: No matching type in {token}"
-            return False,msg
 
-    print("End of parse_expression.")
+        case _: # Terminal
+            retcode,term = _parse_term(token=token)
+            if retcode:
+                expression.set_expression_left(term) 
+            else:
+                msg = f"Error at {_parse_expression.__qualname__}: No matching type in {token}"
+                return retcode,msg
+
     return _parse_expression(expression=expression,tokens=tokens)
 
-def _parse_term():
+def _parse_term(token:Token) -> (int,'Terminal'):
     # <term> ::= <integer>
     #          | <identifier>
     #          | <string_literal>
-    pass
-
+    t_type = None
+    match(token.get_type()):
+        case tt.IDENTIFIER:
+            t_type = TerminalType.IDENTIFIER
+        
+        case tt.INTEGER:
+            t_type = TerminalType.INTEGER
+        
+        case tt.FLOAT:
+            t_type = TerminalType.FLOAT
+        
+        case tt.STRING_LITERAL:
+            t_type = TerminalType.STRING
+            
+        case _:
+            pass
+        
+    if t_type: 
+        return (True, Terminal(terminal_type=t_type,
+                               value=token.get_value(),
+                               position=token.get_position()))
+    else:
+        return (False, t_type)
+        
 def _parse_function_call(fcall:FunctionCall,tokens:list):
     # <function_call> ::= <identifier> 
-    #                 LPAREN <argument_list> RPAREN  
+    #                 LPAREN <argument_list> RPAREN
+    # <argument_list> ::= <expression> | <argument_list> COMMA <expression> 
+    
+    def get_exp(exp_tokens):
+        exp_tokens.append(Token(t_type=tt.SEMICOLON,value=';',position=token.get_position()))
+        exp_tokens.reverse()
+        exp = Expression()
+        retcode,msg = _parse_expression(expression=exp,tokens=exp_tokens)
+        if retcode:
+            fcall.add_argument(exp)
+
+        return retcode,msg
+        
     token = tokens.pop()
-    while(not token.is_type(tt.RPAREN)): # TODO function call
-        print(f"Parameter: {token}")
+    exp_tokens = []
+    while(not token.is_type(tt.RPAREN)):
+        if token.is_type(tt.COMMA):
+            retcode,msg = get_exp(exp_tokens)
+            if retcode == False:
+                return retcode,msg
+            else:
+                exp_tokens = []
+        else:
+            exp_tokens.append(token)
+
         token = tokens.pop()
+        
+    if exp_tokens: 
+        return get_exp(exp_tokens)
+    else:
+        return True,"ok" # ends on COMMA -> ok?
