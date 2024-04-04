@@ -1,8 +1,16 @@
-import sys,os
-# from my_token import tokenize
-#from objects import*
+import os
+import sys
 
-def test_2():
+# Add the 'src' directory to the Python module search path
+path = os.getcwd() + '/src'
+sys.path.insert(0, path)
+
+# Import local modules
+import fc_token
+import fc_parse
+import fc_ast
+
+def test_ast_functions():
     from fc_ast import Program,Statement,StatementType,Expression,Terminal,TerminalType,Operator
 
     def get_structure() -> Program:
@@ -68,28 +76,22 @@ def test_1():
             assert(ast_prog.get_function_list()[1].get_statement_list() != ast_prog.get_function_list()[0].get_statement_list())
 
             print(f"{ast_prog=}")
-            # for f in ast_prog.get_function_list():
-            #     print(f"{f=}")
+            return ast_prog
         else:
             print(f'Parse fail: {message}')
     else:
         print('End with failure: ', return_msg)
-    # for t in tokens:
-    #     print(t)
 
+    return None
+def test_2(prog:'Program'):
+    print("Start test...")
+    return True
 def main() -> int:
-    try:
-        import fc_token,fc_parse,fc_ast
-        print(f"Module {fc_token},{fc_parse},{fc_ast} imported successfully!")
-    except ImportError:
-        print("Failed to import 'example_module'")
     print('='*20,'test1','='*20)
-    test_1()
-    # print('='*20,'test2','='*20)
-    # test_2()
+    ast_prog = test_1()
+    print('='*20,'test2','='*20)
+    test_2(ast_prog)
     return 1
     
 if __name__ == '__main__':
-    path = os.getcwd() + '/src'
-    sys.path.insert(0, path)
     sys.exit(main())
