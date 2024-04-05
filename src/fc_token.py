@@ -46,9 +46,9 @@ class TokenType(Enum):
 def get_regex() -> dict:
     tt = TokenType
     return {
-        tt.PROGRAM: r"PROGRAM",
-        tt.FUNC: r"FUNC",
-        tt.RETURN_STATEMENT: r"RETURN",
+        tt.PROGRAM: r"PROGRAM|Program",
+        tt.FUNC: r"FUNC|func",
+        tt.RETURN_STATEMENT: r"RETURN|return",
         tt.LPAREN: r"\(",
         tt.RPAREN: r"\)",
         tt.LBRACE : r"\{",

@@ -85,8 +85,8 @@ class StatementType(Enum):
 class Statement():
     def __init__(self,position,statement_type=None,statement=None,value=None):
         self._position = position
-        self._statement=statement
-        self._type=statement_type
+        self._statement = statement
+        self._type = statement_type
         self._value = value
         
     def get_position():
@@ -160,6 +160,19 @@ class Operator(Enum):
                 return True,Operator.DIV
             case _:
                 return False,None
+            
+    def get_operator(self) -> str:
+        match(self):
+            case Operator.ADD:
+                return '+'
+            case Operator.SUB:
+                return '-'
+            case Operator.MUL:
+                return '*'
+            case Operator.DIV:
+                return '/'
+            case _:
+                return None
                
 class Expression():
     def __init__(self,expression_left=None,expression_right=None,operator:Operator=None,sub_exp=False):
@@ -183,6 +196,25 @@ class Expression():
         return self._exp_right 
     def is_sub_exp() -> bool:
         return self._sub_exp
+    
+    def get_data_types(self) -> []:
+        data_types = []
+        def _search_exp(left,right):
+            if isinstance(left,Terminal):
+                data_types.append((left.get_type(),left.get_value()))
+            
+            elif isinstance(left,Expression):
+                _search_exp(left.get_expression_left(),left.get_expression_right())
+                
+            if isinstance(right,Terminal):
+                data_types.append((right.get_type(),right.get_value()))
+                print("possibru?")
+                
+            elif isinstance(right,Expression):
+                _search_exp(right.get_expression_left(),right.get_expression_right())
+                
+        _search_exp(self.get_expression_left(),self.get_expression_right())
+        return data_types
     
     def __repr__(self) -> str:        
         left = ""

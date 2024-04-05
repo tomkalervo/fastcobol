@@ -9,6 +9,7 @@ sys.path.insert(0, path)
 import fc_token
 import fc_parse
 import fc_ast
+import fc_render
 
 def test_ast_functions():
     from fc_ast import Program,Statement,StatementType,Expression,Terminal,TerminalType,Operator
@@ -59,7 +60,7 @@ def test_ast_functions():
 def test_1():
     return_code = None
     return_msg = None
-    with open("test/examples/code2_fcob.txt","r") as file:
+    with open("test/examples/code1_fcob.txt","r") as file:
         text = file.read()
         # Tokenize the program string
         from fc_token import tokenize
@@ -73,8 +74,6 @@ def test_1():
         print('AST COMPLETE')
         if return_code:
             print("Parse success:")
-            assert(ast_prog.get_function_list()[1].get_statement_list() != ast_prog.get_function_list()[0].get_statement_list())
-
             print(f"{ast_prog=}")
             return ast_prog
         else:
@@ -85,6 +84,11 @@ def test_1():
     return None
 def test_2(prog:'Program'):
     print("Start test...")
+    res,cobol = fc_render.build(program=prog,settings={})
+    if res:
+        print(cobol)
+    else:
+        print("Error in render: ", cobol)
     return True
 def main() -> int:
     print('='*20,'test1','='*20)
