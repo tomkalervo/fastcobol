@@ -12,12 +12,19 @@ After that, a list with features will be evaluated and prioritezed. And the road
 
 In the far future I hope to be able to add/import cobol copys, external function calls, settings for different policies and maybe even try to implement OOP.
 
-## grammar
+## Grammar
 The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus?Naur_form). Developing fastcobol is an iterative process and the grammar will also be evaluated, modified and expanded during the process. It is a good reference to what is currently supported, or what will be supported in the coming release.
 
-### alpha 0.2
+### History
+- Alpha 0.3: Added support for memory management. Memory management in Cobol is a tedious task, however, it is (one of) the reason for its efficiency. My first approach was to make all the memory management hidden from the user. That approach woulf leave out many of the benefits of organizing and managing the allocation of memory- and probably lead to a large and un-managable working-storage. As of now, I will continue to leave out variable declarations. This might be re-evaluated in the future.
+
+### Alpha 0.3
 ```
-<program> ::= PROGRAM <identifier> LBRACE <statement_list> <function_list> RBRACE 
+<program> ::= PROGRAM <identifier> LBRACE <memory_list> <statement_list> <function_list> RBRACE 
+
+<memory_list>  ::= { <memory_declaration> }
+<memory_declaration> ::= DATA <identifier> <abbreviation> SEMICOLON
+<abbreviation> ::= <identifier>
 
 <function_list> ::= { <function> } 
 <function> ::= FUNC <identifier> 
@@ -35,7 +42,7 @@ The grammar is written in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backu
 <statement> ::= <assignment_statement> SEMICOLON
               | <function_call> SEMICOLON
  
-<assignment_statement> ::= <identifier> <assignment> <operator> <expression> 
+<assignment_statement> ::= <identifier> <assignment> <expression> 
 <assignment> ::= '='
 
 <function_call> ::= <identifier> 
